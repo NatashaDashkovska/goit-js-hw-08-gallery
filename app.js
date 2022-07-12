@@ -76,34 +76,35 @@ const bodyRef = document.querySelector('body');
 galleryRef.addEventListener('click', openModal);
 btnCloseRef.addEventListener('click', closeModal);
 overlayRef.addEventListener('click', closeModal);
+let newIdx = 0;
 
-function createImage(arr) {
-  let images = '';
-  arr.forEach(elem => {
-    images += `<li class="gallery__item">
-  <a
-    class="gallery__link"
-    href=${elem.original}
-  >
-    <img
-      class="gallery__image"
-      src=${elem.preview}
-      data-source=${elem.original}
-      alt="${elem.description}"
-    />
-  </a>
-</li>`;
-  });
+const createItem = galleryItems.map((elem, idx) => {
+  const listItem = document.createElement('li');
+  const linkItem = document.createElement('a');
+  const image = document.createElement('img');
 
-  return images;
-}
+  listItem.classList.add('gallery__item');
+  linkItem.classList.add('gallery__link');
+  image.classList.add('gallery__image');
+  image.setAttribute('data-source', elem.original);
+  image.setAttribute('data-index', [idx]);
 
-galleryRef.insertAdjacentHTML('beforeend', createImage(galleryItems));
+  image.src = elem.preview;
+  image.alt = elem.description;
+  linkItem.href = elem.original;
+
+  linkItem.appendChild(image);
+  listItem.appendChild(linkItem);
+  return listItem;
+});
+
+galleryRef.append(...createItem);
 
 function closeModal() {
   modalRef.classList.remove('is-open');
   modalImageRef.src = '';
   bodyRef.removeEventListener('keydown', closeModalWithEsc);
+  bodyRef.removeEventListener('keydown', nextImage);
 }
 
 function openModal(event) {
@@ -116,11 +117,23 @@ function openModal(event) {
   modalRef.classList.add('is-open');
   modalImageRef.src = event.target.dataset.source;
   modalImageRef.alt = event.target.alt;
+  newIdx = event.target.dataset.index;
+  newIdx = Number(newIdx);
   bodyRef.addEventListener('keydown', closeModalWithEsc);
+  bodyRef.addEventListener('keydown', nextImage);
 }
 
 function closeModalWithEsc(event) {
   if (event.code === 'Escape') {
     closeModal();
+  }
+}
+
+function nextImage(event) {
+  console.log(event.target);
+  if (event.code === 'ArrowRight') {
+    const nextIdx = (newIdx += 1);
+    console.log(nextIdx);
+    modalImageRef.src = galleryItems[nextIdx].original;
   }
 }
