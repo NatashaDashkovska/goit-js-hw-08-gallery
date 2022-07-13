@@ -130,10 +130,14 @@ function closeModalWithEsc(event) {
 }
 
 function nextImage(event) {
-  console.log(event.target);
-  if (event.code === 'ArrowRight') {
+  if (event.code === 'ArrowRight' && newIdx < galleryItems.length - 1) {
     const nextIdx = (newIdx += 1);
-    console.log(nextIdx);
+
     modalImageRef.src = galleryItems[nextIdx].original;
+  }
+  if (event.code === 'ArrowLeft' && newIdx > 0) {
+    const prevIdx = (newIdx -= 1);
+
+    modalImageRef.src = galleryItems[prevIdx].original;
   }
 }
